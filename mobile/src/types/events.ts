@@ -35,6 +35,8 @@ export type Alert = {
   status: AlertStatus;
   createdAt: string;
   updatedAt: string;
+  acknowledgedBy?: string;
+  resolvedBy?: string;
 };
 
 // Metrics pushed from backend
@@ -49,7 +51,7 @@ export type Metrics = {
   updatedAt: string;
 };
 
-// Audit (for later)
+// Audit 
 export type AuditAction =
   | "ALERT_ACKNOWLEDGED"
   | "ALERT_RESOLVED"
@@ -83,7 +85,6 @@ export type SocketPayloadMap = {
   AUDIT_LOGGED: AuditLog;
 };
 
-// ✅ This is the key fix: make it a discriminated union
 export type SocketEvent =
   | { type: "ORDER_CREATED"; payload: Order; timestamp: string }
   | { type: "ORDER_UPDATED"; payload: Order; timestamp: string }

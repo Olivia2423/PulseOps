@@ -64,6 +64,38 @@ app.get("/api/alerts", (_req, res) => {
   res.json(Array.from(db.alerts.values()));
 });
 
+app.post("/api/alerts/:id/ack", (req, res) => {
+  const alert = db.alerts.get(req.params.id);
+  if (!alert) return res.status(404).json({ error: "Alert not found" });
+
+  if (alert.status === "RESOLVED") return res.json(alert);
+
+  alert.status = "ACKNOWLEDGED";
+  alert.acknowledgedBy = "operator";
+  alert.updatedAt = nowIso();
+
+  emit({ type: "ALERT_UPDATED", payload: alert, timestamp: alert.updatedAt });
+  logAudit("operator", "ALERT_ACKNOWLEDGED", alert.id, "Acknowledged alert");
+
+  res.json(alert);
+});
+
+app.post("/api/alerts/:id/resolve", (req, res) => {
+  const alert = db.alerts.get(req.params.id);
+  if (!alert) return res.status(404).json({ error: "Alert not found" });
+
+  if (alert.status === "RESOLVED") return res.json(alert);
+
+  alert.status = "RESOLVED";
+  alert.resolvedBy = "operator";
+  alert.updatedAt = nowIso();
+
+  emit({ type: "ALERT_UPDATED", payload: alert, timestamp: alert.updatedAt });
+  logAudit("operator", "ALERT_RESOLVED", alert.id, "Resolved alert");
+
+  res.json(alert);
+});
+
 app.get("/api/audit", (_req, res) => {
   res.json(db.audit.slice(-200).reverse());
 });
