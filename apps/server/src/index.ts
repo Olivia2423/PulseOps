@@ -32,6 +32,34 @@ app.get("/api/orders/:id", (req, res) => {
   res.json(order);
 });
 
+app.post("/api/orders/:id/retry", (req, res) => {
+  const order = db.orders.get(req.params.id);
+  if (!order) return res.status(404).json({ error: "Order not found" });
+
+  // Only meaningful if failed, but allow retry anytime for demo
+  order.retryCount += 1;
+
+  // If it was payment failed, move back into processing
+  if (order.state === "PAYMENT_FAILED") {
+    order.transitions.push({
+      from: order.state,
+      to: "PAYMENT_PROCESSING",
+      at: nowIso(),
+      reason: "Manual retry triggered by operator",
+    });
+    order.state = "PAYMENT_PROCESSING";
+    order.updatedAt = nowIso();
+  } else {
+    order.updatedAt = nowIso();
+  }
+
+  // emit update + audit
+  emit({ type: "ORDER_UPDATED", payload: order, timestamp: order.updatedAt });
+  logAudit("operator", "ORDER_RETRIED", order.id, "Retry processing");
+
+  res.json(order);
+});
+
 app.get("/api/alerts", (_req, res) => {
   res.json(Array.from(db.alerts.values()));
 });
