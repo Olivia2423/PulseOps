@@ -122,46 +122,109 @@ function logAudit(actor: string, action: string, targetId: string, message?: str
 }
 
 function maybeTriggerAlerts(metrics: Metrics) {
-  // Payment failure rate alert
-  if (metrics.failureRatePct > 15) {
-    const existing = Array.from(db.alerts.values()).find(
-      (a) => a.type === "PAYMENT_FAILURE_RATE" && a.status !== "RESOLVED"
-    );
+  const findByType = (type: Alert["type"]) =>
+    Array.from(db.alerts.values()).find((a) => a.type === type);
+
+  const openOrReopen = (
+    type: Alert["type"],
+    title: string,
+    severity: Alert["severity"]
+  ) => {
+    const existing = findByType(type);
+
+    // Create new alert if none exists
     if (!existing) {
       const alert: Alert = {
         id: id("alrt"),
-        type: "PAYMENT_FAILURE_RATE",
-        title: `Payment failure rate high (${metrics.failureRatePct}%)`,
-        severity: "HIGH",
+        type,
+        title,
+        severity,
         status: "OPEN",
         createdAt: nowIso(),
         updatedAt: nowIso(),
         notes: [],
       };
+
       db.alerts.set(alert.id, alert);
-      emit({ type: "ALERT_TRIGGERED", payload: alert, timestamp: alert.createdAt });
+
+      emit({
+        type: "ALERT_TRIGGERED",
+        payload: alert,
+        timestamp: alert.createdAt,
+      });
+
+      return;
     }
+
+    // Reopen if previously resolved
+    if (existing.status === "RESOLVED") {
+      existing.status = "OPEN";
+      existing.updatedAt = nowIso();
+      existing.title = title;
+
+      emit({
+        type: "ALERT_UPDATED",
+        payload: existing,
+        timestamp: existing.updatedAt,
+      });
+
+      logAudit("system", "ALERT_REOPENED", existing.id, "Condition regressed");
+
+      return;
+    }
+
+    // If already OPEN or ACKNOWLEDGED, just refresh metadata
+    existing.title = title;
+    existing.updatedAt = nowIso();
+
+    emit({
+      type: "ALERT_UPDATED",
+      payload: existing,
+      timestamp: existing.updatedAt,
+    });
+  };
+
+  const resolveIfRecovered = (type: Alert["type"], reason: string) => {
+    const existing = findByType(type);
+    if (!existing) return;
+
+    if (existing.status !== "RESOLVED") {
+      existing.status = "RESOLVED";
+      existing.updatedAt = nowIso();
+
+      emit({
+        type: "ALERT_UPDATED",
+        payload: existing,
+        timestamp: existing.updatedAt,
+      });
+
+      logAudit("system", "ALERT_RESOLVED", existing.id, reason);
+    }
+  };
+
+  // ----- Payment Failure Rule -----
+  if (metrics.failureRatePct > 15) {
+    openOrReopen(
+      "PAYMENT_FAILURE_RATE",
+      `Payment failure rate high (${metrics.failureRatePct}%)`,
+      "HIGH"
+    );
+  } else {
+    resolveIfRecovered(
+      "PAYMENT_FAILURE_RATE",
+      "Payment failure rate recovered"
+    );
   }
 
-  // Backlog high alert
+  // ----- Backlog Rule -----
   if (metrics.backlogCount > 50) {
-    const existing = Array.from(db.alerts.values()).find(
-      (a) => a.type === "BACKLOG_HIGH" && a.status !== "RESOLVED"
+    openOrReopen(
+      "BACKLOG_HIGH",
+      `Backlog high (${metrics.backlogCount})`,
+      "MEDIUM"
     );
-    if (!existing) {
-      const alert: Alert = {
-        id: id("alrt"),
-        type: "BACKLOG_HIGH",
-        title: `Backlog high (${metrics.backlogCount})`,
-        severity: "MEDIUM",
-        status: "OPEN",
-        createdAt: nowIso(),
-        updatedAt: nowIso(),
-        notes: [],
-      };
-      db.alerts.set(alert.id, alert);
-      emit({ type: "ALERT_TRIGGERED", payload: alert, timestamp: alert.createdAt });
-    }
+  } else {
+    resolveIfRecovered("BACKLOG_HIGH", "Backlog recovered");
   }
 }
 

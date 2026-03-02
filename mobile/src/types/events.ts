@@ -57,7 +57,8 @@ export type AuditAction =
   | "ALERT_RESOLVED"
   | "ORDER_RETRIED"
   | "ORDER_PRIORITY_CHANGED"
-  | "ORDER_FLAGGED";
+  | "ORDER_FLAGGED"
+  | "ALERT_REOPENED";
 
 export type AuditLog = {
   id: string;
