@@ -1,12 +1,23 @@
 import { useEffect } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  SectionList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { ackAlert, fetchAlerts, resolveAlert } from "@/services/alertsService";
 import { useAlertsStore } from "@/store/useAlertsStore";
 import type { Alert } from "@/types/events";
 
 function SeverityBadge({ severity }: { severity: Alert["severity"] }) {
   const style =
-    severity === "HIGH" ? styles.high : severity === "MEDIUM" ? styles.med : styles.low;
+    severity === "HIGH"
+      ? styles.high
+      : severity === "MEDIUM"
+        ? styles.med
+        : styles.low;
 
   return (
     <View style={[styles.badge, style]}>
@@ -21,7 +32,9 @@ export default function AlertsScreen() {
   const upsertAlert = useAlertsStore((s) => s.upsertAlert);
 
   useEffect(() => {
-    fetchAlerts().then(setAlerts).catch((e) => console.log("fetchAlerts error", e));
+    fetchAlerts()
+      .then(setAlerts)
+      .catch((e) => console.log("fetchAlerts error", e));
   }, [setAlerts]);
 
   async function onAck(id: string) {
@@ -35,22 +48,46 @@ export default function AlertsScreen() {
   }
 
   // Optional: show only active alerts
-  const active = alerts.filter((a) => a.status !== "RESOLVED");
+  const active = alerts
+    .filter((a) => a.status !== "RESOLVED")
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
 
-  return (
-    <FlatList
-      data={active}
-      keyExtractor={(a) => a.id}
-      contentContainerStyle={styles.list}
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <Text style={styles.title}>Alerts</Text>
-          <Text style={styles.sub}>
-            {active.length === 0 ? "No active alerts 🎉" : `${active.length} active`}
-          </Text>
-        </View>
-      }
-      renderItem={({ item }) => (
+  const resolved = alerts
+    .filter((a) => a.status === "RESOLVED")
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    )
+    .slice(0, 10);
+
+return (
+  <SectionList
+    sections={[
+      { title: `Active Alerts (${active.length})`, data: active },
+      { title: `Recently Resolved (${resolved.length})`, data: resolved },
+    ]}
+    keyExtractor={(item) => item.id}
+    contentContainerStyle={styles.list}
+    ListHeaderComponent={
+      <View style={styles.header}>
+        <Text style={styles.title}>Alerts</Text>
+        <Text style={styles.sub}>
+          Active alerts stay here. Resolved alerts move to “Recently Resolved”.
+        </Text>
+      </View>
+    }
+    renderSectionHeader={({ section }) => (
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{section.title}</Text>
+      </View>
+    )}
+    renderItem={({ item, section }) => {
+      const isResolvedSection = section.title.startsWith("Recently Resolved");
+
+      return (
         <View style={styles.card}>
           <View style={styles.row}>
             <Text style={styles.alertTitle}>{item.title}</Text>
@@ -63,21 +100,40 @@ export default function AlertsScreen() {
             <Text style={styles.meta}>Acknowledged by: {item.acknowledgedBy}</Text>
           ) : null}
 
-          <View style={styles.actions}>
-            {item.status === "OPEN" ? (
-              <Pressable onPress={() => onAck(item.id)} style={styles.btn}>
-                <Text style={styles.btnText}>Acknowledge</Text>
-              </Pressable>
-            ) : null}
+          <Text style={styles.meta}>
+            Updated: {new Date(item.updatedAt).toLocaleTimeString()}
+          </Text>
 
-            <Pressable onPress={() => onResolve(item.id)} style={styles.btn}>
-              <Text style={styles.btnText}>Resolve</Text>
-            </Pressable>
-          </View>
+          {!isResolvedSection ? (
+            <View style={styles.actions}>
+              {item.status === "OPEN" ? (
+                <Pressable onPress={() => onAck(item.id)} style={styles.btn}>
+                  <Text style={styles.btnText}>Acknowledge</Text>
+                </Pressable>
+              ) : null}
+
+              <Pressable onPress={() => onResolve(item.id)} style={styles.btn}>
+                <Text style={styles.btnText}>Resolve</Text>
+              </Pressable>
+            </View>
+          ) : null}
         </View>
-      )}
-    />
-  );
+      );
+    }}
+    renderSectionFooter={({ section }) =>
+      section.data.length === 0 ? (
+        <Text style={styles.empty}>
+          {section.title.startsWith("Active")
+            ? "No active alerts 🎉"
+            : "No resolved alerts yet"}
+        </Text>
+      ) : (
+        <View style={{ height: 6 }} />
+      )
+    }
+    stickySectionHeadersEnabled
+  />
+);
 }
 
 const styles = StyleSheet.create({
@@ -94,7 +150,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  sectionHeader: { marginTop: 14, marginBottom: 8 },
+  sectionTitle: { fontSize: 16, fontWeight: "800" },
+  empty: { opacity: 0.7, marginBottom: 10 },
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   alertTitle: { fontWeight: "700", flex: 1, marginRight: 10 },
 
   meta: { marginTop: 6, opacity: 0.75 },
