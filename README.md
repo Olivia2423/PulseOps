@@ -6,6 +6,22 @@ PulseOps simulates a distributed order-processing system and provides live visib
 
 ---
 
+## App Screenshots
+
+| Dashboard | Live Feed |
+|----------|-----------|
+| ![](<img width="328" height="740" alt="image" src="https://github.com/user-attachments/assets/81d2c3a5-7271-4bd4-bee3-d6c20bb21246" />
+) | ![](screenshots/livefeed.png) |
+
+| Alerts | Orders |
+|------|------|
+| ![](screenshots/alerts.png) | ![](screenshots/orders.png) |
+
+| Audit Log |
+|----------|
+| ![](screenshots/audit.png) |
+
+---
 # Demo Capabilities
 
 PulseOps simulates how operational teams monitor and manage large-scale transaction pipelines.
@@ -105,12 +121,12 @@ This simulates compliance and observability patterns used in enterprise systems.
 # Real-Time Event Streaming
 
 The backend emits events via WebSockets:
-ORDER_CREATED
-ORDER_UPDATED
-ALERT_TRIGGERED
-ALERT_UPDATED
-METRICS_UPDATED
-AUDIT_LOGGED
+ORDER_CREATED,
+ORDER_UPDATED,
+ALERT_TRIGGERED,
+ALERT_UPDATED,
+METRICS_UPDATED,
+AUDIT_LOGGED.
 
 
 The mobile client subscribes to these events and updates UI state instantly.
