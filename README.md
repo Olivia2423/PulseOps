@@ -10,16 +10,15 @@ PulseOps simulates a distributed order-processing system and provides live visib
 
 | Dashboard | Live Feed |
 |----------|-----------|
-| ![](<img width="328" height="740" alt="image" src="https://github.com/user-attachments/assets/81d2c3a5-7271-4bd4-bee3-d6c20bb21246" />
-) | ![](screenshots/livefeed.png) |
+| <img src="https://github.com/user-attachments/assets/81d2c3a5-7271-4bd4-bee3-d6c20bb21246" width="250"/> | <img src="https://github.com/user-attachments/assets/3407d717-c379-498e-b621-82d9aea896ab" width="250"/> |
 
 | Alerts | Orders |
 |------|------|
-| ![](screenshots/alerts.png) | ![](screenshots/orders.png) |
+| <img src="https://github.com/user-attachments/assets/6636d81e-1be2-4f8f-84c1-b0f4d7e25957" width="250"/> | <img src="https://github.com/user-attachments/assets/99a6c91a-c979-498e-ace3-752ef066ca08" width="250"/> |
 
 | Audit Log |
 |----------|
-| ![](screenshots/audit.png) |
+| <img src="https://github.com/user-attachments/assets/ab6bf27c-662a-45a4-ae77-d22653d4b7ef" width="250"/> |
 
 ---
 # Demo Capabilities
