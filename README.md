@@ -25,15 +25,24 @@ Orders continuously flow through a distributed pipeline while the mobile app obs
 
 ## System Architecture
 
-flowchart LR
-    A[Simulation Engine<br>Node.js] -->|emits events| B[WebSocket Server<br>Socket.io]
-    B -->|real-time updates| C[React Native Mobile App]
+PulseOps uses an event-driven architecture.
 
-    C --> D[Dashboard Metrics]
-    C --> E[Live Activity Feed]
-    C --> F[Alerts & Incident Management]
-    C --> G[Order Lifecycle Inspection]
-    C --> H[Audit Log]
+The backend simulation engine generates order activity and system events.  
+These events are streamed to the mobile application in real time using WebSockets.
+
+**Flow:**
+
+Backend Simulation Engine (Node.js)  
+→ WebSocket Server (Socket.io)  
+→ React Native Mobile App
+
+The mobile app displays these events across multiple operational views:
+
+- Dashboard – system health metrics
+- Live Feed – real-time event stream
+- Alerts – incident monitoring and response
+- Orders – order lifecycle inspection
+- Audit Log – operator activity history
 
 
 The system uses an event-driven architecture where backend events stream to the mobile client via WebSockets.
@@ -132,26 +141,6 @@ The mobile client subscribes to these events and updates UI state instantly.
 - Real-time streaming
 - Domain-driven state modeling
 - Operational monitoring simulation
-
----
-
-# Project Structure
-PulseOps
-│
-├── mobile
-│   ├── app
-│   ├── services
-│   ├── store
-│   └── types
-│
-├── apps
-│   └── server
-│       ├── simulation
-│       ├── metrics
-│       └── alerts
-
-
-The repository is structured as a monorepo separating the mobile client and backend simulation engine.
 
 ---
 
