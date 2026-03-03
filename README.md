@@ -25,20 +25,20 @@ Orders continuously flow through a distributed pipeline while the mobile app obs
 
 # System Architecture
 Simulation Engine (Node.js)
-        │
-        │ emits events
-        ▼
+│
+│ emits events
+▼
 WebSocket Server (Socket.io)
-        │
-        │ real-time updates
-        ▼
+│
+│ real-time updates
+▼
 React Native Mobile App
-        │
-        ├── Dashboard Metrics
-        ├── Live Activity Feed
-        ├── Alerts & Incident Management
-        ├── Order Lifecycle Inspection
-        └── Audit Log
+│
+├── Dashboard Metrics
+├── Live Activity Feed
+├── Alerts & Incident Management
+├── Order Lifecycle Inspection
+└── Audit Log
 
 
 The system uses an event-driven architecture where backend events stream to the mobile client via WebSockets.
@@ -223,10 +223,10 @@ These patterns are commonly used in logistics systems, payment platforms, market
 # Author
 
 **Stephanie Chinaza Collins**  
-Software Development Student – Seneca Polytechnic
+Software Development Student – Olivia Kewang
 
-GitHub: https://github.com/sccollins1  
-LinkedIn: https://linkedin.com/in/steph-collins
+GitHub: https://github.com/Olivia2423 
+LinkedIn: https://www.linkedin.com/in/olivia-christy/
 
 ---
 
