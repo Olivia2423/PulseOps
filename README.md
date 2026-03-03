@@ -163,7 +163,7 @@ The repository is structured as a monorepo separating the mobile client and back
 # Running the Project
 
 ## 1. Clone the repository
-git clone *your github id*
+git clone https://github.com/Olivia2423/PulseOps.git
 cd PulseOps
 
 ---
