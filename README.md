@@ -23,22 +23,17 @@ Orders continuously flow through a distributed pipeline while the mobile app obs
 
 ---
 
-# System Architecture
-Simulation Engine (Node.js)
-│
-│ emits events
-▼
-WebSocket Server (Socket.io)
-│
-│ real-time updates
-▼
-React Native Mobile App
-│
-├── Dashboard Metrics
-├── Live Activity Feed
-├── Alerts & Incident Management
-├── Order Lifecycle Inspection
-└── Audit Log
+## System Architecture
+
+flowchart LR
+    A[Simulation Engine<br>Node.js] -->|emits events| B[WebSocket Server<br>Socket.io]
+    B -->|real-time updates| C[React Native Mobile App]
+
+    C --> D[Dashboard Metrics]
+    C --> E[Live Activity Feed]
+    C --> F[Alerts & Incident Management]
+    C --> G[Order Lifecycle Inspection]
+    C --> H[Audit Log]
 
 
 The system uses an event-driven architecture where backend events stream to the mobile client via WebSockets.
@@ -163,15 +158,15 @@ The repository is structured as a monorepo separating the mobile client and back
 # Running the Project
 
 ## 1. Clone the repository
-git clone https://github.com/Olivia2423/PulseOps.git
-cd PulseOps
+- git clone https://github.com/Olivia2423/PulseOps.git
+- cd PulseOps
 
 ---
 
 ## 2. Start the backend server
-cd apps/server
-npm install
-npm run dev
+- cd apps/server
+- npm install
+- npm run dev
 
 
 Server runs at: http://localhost:4000
@@ -179,9 +174,9 @@ Server runs at: http://localhost:4000
 ---
 
 ## 3. Start the mobile application
-cd mobile
-npm install
-npx expo start
+- cd mobile
+- npm install
+- npx expo start
 
 
 Open the app using:
@@ -222,11 +217,11 @@ These patterns are commonly used in logistics systems, payment platforms, market
 
 # Author
 
-**Stephanie Chinaza Collins**  
+**Olivia Kewang**  
 Software Development Student – Olivia Kewang
 
-GitHub: https://github.com/Olivia2423 
-LinkedIn: https://www.linkedin.com/in/olivia-christy/
+- GitHub: https://github.com/Olivia2423 
+- LinkedIn: https://www.linkedin.com/in/olivia-christy/
 
 ---
 
